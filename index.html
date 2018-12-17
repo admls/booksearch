@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Booksearch</title>
+    <style type="text/css">body { font-family: arial,sans-serif;} </style>
+</head>
+<body>
+    <h1>Booksearch</h1>
+    <h2>Booklist</h2>
+    <div>
+        <button onclick="handlers.addBook()">Add</button>
+        <input id="addBookTitle" type="text" placeholder="Title">
+        <input id="addBookAuthor" type="text" placeholder="Author">
+        <input id="addBookMaxPrice" type="number" placeholder="Maximum price">
+    </div>
+    <ul class="booklist">
+    </ul>
+    <div id="results"></div>
+
+    <script src="booksearch.js">
+    </script>
+</body>
+</html>
