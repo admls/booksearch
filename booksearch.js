@@ -15,9 +15,15 @@ const booklist = {
         this.books[position].title = title;
         this.books[position].author = author;
         this.books[position].maxPrice = maxPrice;
+        localStorage.setItem("books", JSON.stringify(this.books));
     },
     deleteBook: function(position) {
-        this.books.splice(position, 1);
+        if (this.books.length === 1) {
+            this.books = [];
+        } else {
+            this.books.splice(position, 1);
+        }
+        localStorage.setItem("books", JSON.stringify(this.books));
     }
 };
 
@@ -30,7 +36,6 @@ const handlers = {
         addBookTitle.value = "";
         addBookAuthor.value = "";
         addBookMaxPrice.value = "";
-        debugger;
         view.displayBooklist();
         addBookTitle.focus();
     },
@@ -42,13 +47,10 @@ const handlers = {
         booklist.editBook(position, bookTitle, bookAuthor, bookMaxPrice);
     },
     deleteBook: function(position) {
+        booklist.deleteBook(parseInt(position));
+        console.log(localStorage.getItem("books"));
         const bookLi = document.getElementById(position);
         bookLi.style.animationPlayState = "running";
-        bookLi.addEventListener("animationend", () => {
-            console.log(bookLi.style.height);
-            booklist.deleteBook(parseInt(position));
-            view.displayBooklist();
-        })
     }
   };
 
@@ -100,9 +102,9 @@ var view = {
             bookField.addEventListener("keyup", () => {
                 handlers.editBook(parseInt(bookField.parentNode.id));
             });
-            bookField.addEventListener("blur", () => {
-                this.displayBooklist();
-            })
+            // bookField.addEventListener("blur", () => {
+            //     this.displayBooklist();
+            // })
         }, this);
 
         document.querySelectorAll(".getResults").forEach(function(button) {
@@ -117,7 +119,7 @@ var view = {
                     maxPrice = (book.maxPrice) ? book.maxPrice : "3";
                     const filterarray = constructFilterArray(maxPrice, "GBP");
                     const urlfilter = buildURLArray(filterarray);
-                    const url = constructURL(urlfilter, searchTerm, "GB", "10");
+                    const url = constructURL(urlfilter, searchTerm, "GB", "2");
 
                     // Submit the request
                     s=document.createElement('script'); // create script element
