@@ -9,16 +9,28 @@
 </head>
 <body>
     <h1>Booksearch</h1>
-    <h2>Booklist</h2>
-    <div>
-        <button onclick="handlers.addBook()">Add</button>
-        <input id="addBookTitle" type="text" placeholder="Title">
-        <input id="addBookAuthor" type="text" placeholder="Author">
-        <input id="addBookMaxPrice" type="number" placeholder="Maximum price">
+    <div id="booklist">
+        <h2>Booklist</h2>
+        <button class="getResults">Get Results</button>
+        <div>
+            <form>
+                <button onclick="handlers.addBook()">Add</button>
+                <input id="addBookTitle" type="text" placeholder="Title">
+                <input id="addBookAuthor" type="text" placeholder="Author">
+                <input id="addBookMaxPrice" type="number" placeholder="Maximum price">
+            </form>
+        </div>
+        <ul class="booklist">
+        </ul>
+        <button class="getResults">Get Results</button>
     </div>
-    <ul class="booklist">
-    </ul>
-    <div id="results"></div>
+
+
+    <div id="results" style="display: none;">
+        <button class="toBooklist">To Booklist</button>
+        <div id="ebayResults"></div>
+        <button class="toBooklist">To Booklist</button>
+    </div>
 
     <script src="booksearch.js">
     </script>
