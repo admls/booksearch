@@ -156,8 +156,8 @@ var view = {
                 booklist.books.forEach(function(book) {
                     const searchTerm = `${book.title} ${book.author}`;
 
-                    // debugger;
-                    const filterarray = constructFilterArray("3", "GBP");
+                    maxPrice = (book.maxPrice) ? book.maxPrice : "3";
+                    const filterarray = constructFilterArray(maxPrice, "GBP");
                     const urlfilter = buildURLArray(filterarray);
                     const url = constructURL(urlfilter, searchTerm, "GB", "10");
 
