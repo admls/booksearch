@@ -51,8 +51,22 @@ table {
 --------------------------------------------
 Beginning of css styling */
 
+:root {
+    --main-bg-color: #e1d8c9;
+    --secondary-bg-color: #fcfcfe;
+}
+
 body {
     font-family: arial,sans-serif;
+    background-color: var(--main-bg-color);
+}
+
+#booklistDiv {
+    width: 60%;
+    min-height: 80%;
+    margin: auto;
+    background-color: var(--secondary-bg-color);
+    box-shadow: 3px 3px 16px 1px rgba(0,0,0,.2);
 }
 
 input {
@@ -88,6 +102,15 @@ button:focus {
     box-shadow: 2px 2px 6px 1px rgba(0,0,0,.3) inset;
 }
 
+.deleteButton {
+    width: 21px;
+    padding-left: 2px;
+}
+
+#addBookMaxPrice, .maxPrice{
+    width: 40px;
+}
+
 @keyframes deleteBook {
     0% {
         opacity: 1;
@@ -116,3 +139,6 @@ ul.booklist li {
     animation-play-state: paused;
 }
 
+.badInput {
+    background-color: rgba(255,0,0,.3);
+}

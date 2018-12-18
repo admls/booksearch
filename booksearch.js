@@ -32,12 +32,15 @@ const handlers = {
         const addBookTitle = document.getElementById("addBookTitle");
         const addBookAuthor = document.getElementById("addBookAuthor"); 
         const addBookMaxPrice = document.getElementById("addBookMaxPrice");
+        if (!(addBookTitle.value || addBookAuthor.value)) {
+            return false;
+        }
         booklist.addBook(addBookTitle.value, addBookAuthor.value, addBookMaxPrice.value);
         addBookTitle.value = "";
         addBookAuthor.value = "";
         addBookMaxPrice.value = "";
         view.displayBooklist();
-        addBookTitle.focus();
+        addBookTitle.focus();   
     },
     editBook: function(position) {
         const bookLi = document.getElementById(position);
@@ -100,7 +103,15 @@ var view = {
 
         document.querySelectorAll("ul.booklist input").forEach(function(bookField) {
             bookField.addEventListener("keyup", () => {
-                handlers.editBook(parseInt(bookField.parentNode.id));
+                const re = /^\d*\.?\d?\d?$/;
+                if (bookField.className.includes("maxPrice") && !re.test(bookField.value)) {
+                    bookField.classList.add("badInput");
+                } else if (bookField.className.includes("maxPrice") && re.test(bookField.value)) {
+                    bookField.classList.remove("badInput");
+                    handlers.editBook(parseInt(bookField.parentNode.id));
+                } else {
+                    handlers.editBook(parseInt(bookField.parentNode.id));
+                }
             });
             // bookField.addEventListener("blur", () => {
             //     this.displayBooklist();
@@ -109,7 +120,7 @@ var view = {
 
         document.querySelectorAll(".getResults").forEach(function(button) {
             button.addEventListener("click", function() {
-                document.getElementById("booklist").style.display = "none";
+                document.getElementById("booklistDiv").style.display = "none";
                 
                 document.getElementById("ebayResults").innerHTML = "";
 
@@ -132,7 +143,7 @@ var view = {
         });
         document.querySelectorAll(".toBooklist").forEach(function(button) {
             button.addEventListener("click", function() {
-                document.getElementById("booklist").style.display = "block";
+                document.getElementById("booklistDiv").style.display = "block";
                 document.getElementById("results").style.display = "none";
             });
         });
