@@ -101,7 +101,7 @@ var view = {
             };
         });
 
-        document.querySelectorAll("ul.booklist input").forEach(function(bookField) {
+        document.querySelectorAll("input").forEach(function(bookField) {
             bookField.addEventListener("keyup", () => {
                 const re = /^\d*\.?\d?\d?$/;
                 if (bookField.className.includes("maxPrice") && !re.test(bookField.value)) {
