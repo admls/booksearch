@@ -1,24 +1,37 @@
-let books = (localStorage.getItem("books")) ? JSON.parse(localStorage.getItem("books")) : [];
+// The books will be stored in a map object so that they can be
+// called by a unique id and stay in order.
+let books = (localStorage.getItem("books")) ? new Map(JSON.parse(localStorage.getItem("books"))) : new Map();
 document.getElementById("addBookTitle").focus();
 
+// Generates unique ids for books in booklist.
+function uuidv4() {
+    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    )
+};
+
+// Booklist object
 const booklist = {
     books: books,
     addBook: function(title, author, maxPrice) {
-        this.books.push({
+        this.books.set(uuidv4().toString(), {
             title: title,
             author: author,
-            maxPrice: maxPrice,
+            maxPrice: maxPrice
         });
     },
-    editBook: function(position, title, author, maxPrice) {
-        this.books[position].title = title;
-        this.books[position].author = author;
-        this.books[position].maxPrice = maxPrice;
-        localStorage.setItem("books", JSON.stringify(this.books));
+    editBook: function(id, title, author, maxPrice) {
+        if (this.books.has(id)) {
+            const book = this.books.get(id);
+            book.title = title;
+            book.author = author;
+            book.maxPrice = maxPrice;
+            localStorage.setItem("books", JSON.stringify(Array.from(this.books.entries())));
+        }
     },
-    deleteBook: function(position) {
-        this.books.splice(position, 1);
-        localStorage.setItem("books", JSON.stringify(this.books));
+    deleteBook: function(id) {
+        this.books.delete(id);
+        localStorage.setItem("books", JSON.stringify(Array.from(this.books.entries())));
     }
 };
 
@@ -41,21 +54,24 @@ const handlers = {
         view.displayBooklist();
         addBookTitle.focus();   
     },
-    editBook: function(position) {
-        const bookLi = document.getElementById(position);
-        const bookTitle = bookLi.querySelector(".title").value;
-        const bookAuthor = bookLi.querySelector(".author").value;
-        const bookMaxPrice = bookLi.querySelector(".maxPrice").value;
-        booklist.editBook(position, bookTitle, bookAuthor, bookMaxPrice);
+    editBook: function(id) {
+        if (id) {
+            const bookLi = document.getElementById(id);
+            const bookTitle = bookLi.querySelector(".title").value;
+            const bookAuthor = bookLi.querySelector(".author").value;
+            const bookMaxPrice = bookLi.querySelector(".maxPrice").value;
+            booklist.editBook(id, bookTitle, bookAuthor, bookMaxPrice);
+        }
     },
-    deleteBook: function(position) {
-        booklist.deleteBook(parseInt(position));
+    deleteBook: function(id) {
+        booklist.deleteBook(id);
         console.log("----------------")
-        JSON.parse(localStorage.getItem("books")).forEach(function(book) {
+        const books = new Map(JSON.parse(localStorage.getItem("books")))
+        books.forEach(function(book) {
             console.log(book.title)
         })
         console.log("----------------")
-        const bookLi = document.getElementById(position);
+        const bookLi = document.getElementById(id);
         bookLi.style.animationPlayState = "running";
     },
     updateBookField: function(bookField) {
@@ -64,16 +80,25 @@ const handlers = {
             bookField.classList.add("badInput");
         } else if (bookField.className.includes("maxPrice") && re.test(bookField.value)) {
             bookField.classList.remove("badInput");
-            handlers.editBook(parseInt(bookField.parentNode.id));
+            handlers.editBook(bookField.parentNode.id);
         } else {
-            handlers.editBook(parseInt(bookField.parentNode.id));
+            handlers.editBook(bookField.parentNode.id);
         }
     },
-    removeBadInput: function(bookField) {
+    badInput: function(inputField) {
         const re = /^\d*\.?\d?\d?$/;
-        if (!re.test(bookField.value)) {
-            bookField.value = "";
-            bookField.classList.remove("badInput");
+        if (!re.test(inputField.value)) {
+            inputField.classList.add("badInput");
+        } else {
+            inputField.classList.remove("badInput");
+            handlers.editBook(inputField.parentNode.id);
+        }
+    },
+    removeBadInput: function(inputField) {
+        const re = /^\d*\.?\d?\d?$/;
+        if (!re.test(inputField.value)) {
+            inputField.value = "";
+            inputField.classList.remove("badInput");
         }
     },
     getEbayResults: function() {
@@ -103,10 +128,10 @@ const handlers = {
 
 var view = {
     displayBooklist: function() {
-        localStorage.setItem("books", JSON.stringify(booklist.books));
+        localStorage.setItem("books", JSON.stringify(Array.from(booklist.books.entries())));
         const booklistUl = document.querySelector("ul.booklist");
         booklistUl.innerHTML = "";
-        booklist.books.forEach(function(book, position) {
+        booklist.books.forEach(function(book, id) {
             const bookLi = document.createElement('li');
             const titleInput = document.createElement('input');
             const authorInput = document.createElement('input');
@@ -121,7 +146,7 @@ var view = {
             maxPriceInput.value = book.maxPrice;
             maxPriceInput.className = "maxPrice";
 
-            bookLi.id = position;
+            bookLi.id = id;
             bookLi.appendChild(titleInput);
             bookLi.appendChild(authorInput);
             bookLi.appendChild(maxPriceInput);
@@ -143,15 +168,18 @@ var view = {
                 handlers.deleteBook(elementClicked.parentNode.id);
             };
         });
-        document.querySelectorAll("input").forEach(function(bookField) {
+        document.querySelectorAll("li .title, li .author").forEach(function(bookField) {
             bookField.addEventListener("input", () => {
-                handlers.updateBookField(bookField); 
+                handlers.editBook(bookField.parentNode.id); 
             });
-            if (bookField.className.includes("maxPrice")) {
-                bookField.addEventListener("blur", () => {
-                    handlers.removeBadInput(bookField);
-                })
-            }
+        });
+        document.querySelectorAll(".maxPrice").forEach(function(inputField) {
+            inputField.addEventListener("input", () => {
+                handlers.badInput(inputField);
+            });
+            inputField.addEventListener("blur", () => {
+                handlers.removeBadInput(inputField);
+            })
         });
         document.querySelectorAll("ul.booklist li").forEach(function(bookLi) {
             bookLi.addEventListener("animationend", this.displayBooklist)
