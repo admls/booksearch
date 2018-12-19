@@ -158,12 +158,12 @@ var view = {
             bookLi.addEventListener("animationend", this.displayBooklist)
         }, this);
         document.querySelectorAll(".getResults").forEach(function(button) {
-            button.addEventListener("click", function() {
+            button.addEventListener("click", () => {
                 handlers.getEbayResults();
             });
         });
         document.querySelectorAll(".toBooklist").forEach(function(button) {
-            button.addEventListener("click", function() {
+            button.addEventListener("click", () => {
                 handlers.toBookList();
             });
         });
