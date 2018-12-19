@@ -1,14 +1,13 @@
 let books = (localStorage.getItem("books")) ? JSON.parse(localStorage.getItem("books")) : [];
 document.getElementById("addBookTitle").focus();
 
-
 const booklist = {
     books: books,
     addBook: function(title, author, maxPrice) {
         this.books.push({
             title: title,
             author: author,
-            maxPrice: maxPrice
+            maxPrice: maxPrice,
         });
     },
     editBook: function(position, title, author, maxPrice) {
