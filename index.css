@@ -1,0 +1,189 @@
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+/* End of css reset
+--------------------------------------------
+Beginning of css styling */
+
+:root {
+    --main-bg-color: #e1d8c9;
+    --secondary-bg-color: #fcfcfe;
+    --primary-text-color: #777;
+    --understated-text-color: #aaa;
+    --v-understated-text-color: #ccc;
+    --highlight-selection: #555;
+}
+
+body {
+    font-family: monospace, monospace;
+    color: var(--primary-text-color);
+    background-color: var(--main-bg-color);
+    font-weight: bold;
+}
+
+body::selection, input::selection, button::selection, p::selection, div::selection, span::selection, a::selection, h1::selection, h2::selection, h3::selection, h4::selection, h5::selection, h6::selection, form::selection, img::selection {
+    background: var(--highlight-selection);
+    color: var(--v-understated-text-color);
+}
+
+#booklistDiv {
+    width: 60%;
+    min-height: 80%;
+    margin: auto;
+    background-color: var(--secondary-bg-color);
+    box-shadow: 3px 3px 16px 1px rgba(0,0,0,.2);
+}
+
+input {
+    color: var(--primary-text-color);
+    font-family: monospace, monospace;
+    border: none;
+    font-weight: bold;
+    background-color: transparent;
+    margin: 8px 8px 8px 8px;
+    padding: 3px;
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,.05);
+    transition: all .5s;
+}
+
+input::placeholder {
+    color: var(--understated-text-color);
+}
+
+input:hover, input:focus {
+    box-shadow: 3px 3px 12px 1px rgba(0,0,0,.3);
+    padding: 7px;
+    margin: 4px 4px 4px 4px;
+}
+
+ul {
+    list-style-type: none;
+}
+
+button {
+    color: var(--understated-text-color);
+    font-family: monospace, monospace;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    margin: 8px 8px 8px 8px;
+    padding: 3px;
+    background-color: transparent;
+    box-shadow: 2px 2px 6px 1px rgba(0,0,0,.3); 
+    transition: .2s;
+}
+
+button:focus {
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,.05);
+}
+
+
+.deleteButton {
+    color: var(--v-understated-text-color);
+    width: 21px;
+    height: 21px;
+    position: relative;
+    top: 3px;
+    padding: 0px 2px 0px 2px;
+    margin: 0px 0px 0px 10px;
+    box-shadow: none;
+    font-size: 20px;
+    transition: .3s;
+}
+
+.deleteButton:hover {
+    width: 25px;
+    height: 25px;
+    box-shadow: 2px 2px 6px 1px rgba(0,0,0,.3);
+    padding: 2px 6px 8px 6px;
+    margin: 0px 0px 0px 8px;
+}
+
+.deleteButton:focus {
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,.05);
+}
+
+
+#addBookMaxPrice, .maxPrice{
+    width: 40px;
+}
+
+@keyframes deleteBook {
+    0% {
+        opacity: 1;
+        height: 40px;
+        line-height: 20px;
+    }
+    50% {
+        opacity: 0;
+        height: 40px;
+        line-height: 20px;
+    }
+    100% {
+        opacity: 0;
+        height: 0px;
+        line-height: 0px;        
+    }
+}
+
+ul.booklist li {
+    position: relative;
+    padding: 0px;
+    margin: 0px;
+    animation-name: deleteBook;
+    animation-duration: .4s;
+    animation-fill-mode: forwards;
+    animation-play-state: paused;
+}
+
+.badInput {
+    background-color: rgba(255,0,0,.3);
+}
+
+

@@ -1,23 +1,24 @@
 let books = (localStorage.getItem("books")) ? JSON.parse(localStorage.getItem("books")) : [];
 document.getElementById("addBookTitle").focus();
 
-
 const booklist = {
     books: books,
     addBook: function(title, author, maxPrice) {
         this.books.push({
             title: title,
             author: author,
-            maxPrice: maxPrice
+            maxPrice: maxPrice,
         });
     },
-    confirmEditBook: function(position, title, author, maxPrice) {
+    editBook: function(position, title, author, maxPrice) {
         this.books[position].title = title;
         this.books[position].author = author;
         this.books[position].maxPrice = maxPrice;
+        localStorage.setItem("books", JSON.stringify(this.books));
     },
     deleteBook: function(position) {
         this.books.splice(position, 1);
+        localStorage.setItem("books", JSON.stringify(this.books));
     }
 };
 
@@ -26,57 +27,77 @@ const handlers = {
         const addBookTitle = document.getElementById("addBookTitle");
         const addBookAuthor = document.getElementById("addBookAuthor"); 
         const addBookMaxPrice = document.getElementById("addBookMaxPrice");
+        if (!(addBookTitle.value || addBookAuthor.value)) {
+            return false;
+        }
+        const re = /^\d*\.?\d?\d?$/;
+        if (!re.test(addBookMaxPrice.value)) {
+            addBookMaxPrice.value = "";
+        }
         booklist.addBook(addBookTitle.value, addBookAuthor.value, addBookMaxPrice.value);
         addBookTitle.value = "";
         addBookAuthor.value = "";
         addBookMaxPrice.value = "";
-        debugger;
         view.displayBooklist();
-        addBookTitle.focus();
+        addBookTitle.focus();   
     },
     editBook: function(position) {
-        let bookLi = document.getElementById(position);
-        const editingBookLi = document.createElement('li');
-        editingBookLi.id = position;
-
-        const editingTitle = document.createElement('input');
-        editingTitle.value = bookLi.querySelector(".title").textContent;
-        editingTitle.className = "title";
-
-        const editingAuthor = document.createElement('input');
-        editingAuthor.value = bookLi.querySelector(".author").textContent;
-        editingAuthor.className = "author";
-
-        const editingMaxPrice = document.createElement('input');
-        editingMaxPrice.className = "maxPrice";
-        editingMaxPrice.value = bookLi.querySelector(".maxPrice").textContent;
-
-        editingBookLi.appendChild(editingTitle);
-        editingBookLi.appendChild(editingAuthor);
-        editingBookLi.appendChild(editingMaxPrice);
-
-        editingBookLi.appendChild(view.createConfirmEditButton());
-        editingBookLi.appendChild(view.createCancelEditButton());
-        editingBookLi.appendChild(view.createDeleteButton());
-        bookLi.replaceWith(editingBookLi);
-    },
-    cancelEditBook: function() {
-        view.displayBooklist();
-    },
-    confirmEditBook: function(position) {
-        const editingBookLi = document.getElementById(position);
-        const bookTitle = editingBookLi.querySelector(".title").value;
-        const bookAuthor = editingBookLi.querySelector(".author").value;
-        const bookMaxPrice = editingBookLi.querySelector(".maxPrice").value;
-        console.log(bookTitle);
-        console.log(bookAuthor);
-        console.log(bookMaxPrice);
-        booklist.confirmEditBook(position, bookTitle, bookAuthor, bookMaxPrice);
-        view.displayBooklist();
+        const bookLi = document.getElementById(position);
+        const bookTitle = bookLi.querySelector(".title").value;
+        const bookAuthor = bookLi.querySelector(".author").value;
+        const bookMaxPrice = bookLi.querySelector(".maxPrice").value;
+        booklist.editBook(position, bookTitle, bookAuthor, bookMaxPrice);
     },
     deleteBook: function(position) {
-        booklist.deleteBook(position);
-        view.displayBooklist();
+        booklist.deleteBook(parseInt(position));
+        console.log("----------------")
+        JSON.parse(localStorage.getItem("books")).forEach(function(book) {
+            console.log(book.title)
+        })
+        console.log("----------------")
+        const bookLi = document.getElementById(position);
+        bookLi.style.animationPlayState = "running";
+    },
+    updateBookField: function(bookField) {
+        const re = /^\d*\.?\d?\d?$/;
+        if (bookField.className.includes("maxPrice") && !re.test(bookField.value)) {
+            bookField.classList.add("badInput");
+        } else if (bookField.className.includes("maxPrice") && re.test(bookField.value)) {
+            bookField.classList.remove("badInput");
+            handlers.editBook(parseInt(bookField.parentNode.id));
+        } else {
+            handlers.editBook(parseInt(bookField.parentNode.id));
+        }
+    },
+    removeBadInput: function(bookField) {
+        const re = /^\d*\.?\d?\d?$/;
+        if (!re.test(bookField.value)) {
+            bookField.value = "";
+            bookField.classList.remove("badInput");
+        }
+    },
+    getEbayResults: function() {
+        document.getElementById("booklistDiv").style.display = "none";
+        document.getElementById("ebayResults").innerHTML = "";
+        booklist.books.forEach(function(book) {
+            const searchTerm = `${book.title} ${book.author}`;
+
+            maxPrice = (book.maxPrice) ? book.maxPrice : "3";
+            const filterarray = constructFilterArray(maxPrice, "GBP");
+            const urlfilter = buildURLArray(filterarray);
+            const url = constructURL(urlfilter, searchTerm, "GB", "2");
+
+            // Submit the request
+            s=document.createElement('script'); // create script element
+            s.src= url;
+            document.body.appendChild(s);
+
+        })
+        document.getElementById("results").style.display = "block";
+    },
+    toBookList: function() {
+        document.getElementById("booklistDiv").style.display = "block";
+        document.getElementById("results").style.display = "none";
     }
   };
 
@@ -87,93 +108,62 @@ var view = {
         booklistUl.innerHTML = "";
         booklist.books.forEach(function(book, position) {
             const bookLi = document.createElement('li');
-            const titleSpan = document.createElement('span');
-            const authorSpan = document.createElement('span');
-            const maxPriceSpan = document.createElement('span');
+            const titleInput = document.createElement('input');
+            const authorInput = document.createElement('input');
+            const maxPriceInput = document.createElement('input');
 
-            titleSpan.textContent = book.title;
-            titleSpan.className = "title";
-            authorSpan.textContent = book.author;
-            authorSpan.className = "author";
-            maxPriceSpan.textContent = book.maxPrice;
-            maxPriceSpan.className = "maxPrice";
+            titleInput.value = book.title;
+            titleInput.className = "title";
+
+            authorInput.value = book.author;
+            authorInput.className = "author";
+
+            maxPriceInput.value = book.maxPrice;
+            maxPriceInput.className = "maxPrice";
+
             bookLi.id = position;
-            bookLi.appendChild(titleSpan);
-            bookLi.appendChild(authorSpan);
-            bookLi.appendChild(maxPriceSpan);
-            bookLi.appendChild(this.createEditButton());
-            bookLi.appendChild(this.createDeleteButton());
+            bookLi.appendChild(titleInput);
+            bookLi.appendChild(authorInput);
+            bookLi.appendChild(maxPriceInput);
+            bookLi.appendChild(view.createDeleteButton());
             booklistUl.appendChild(bookLi);
         }, this);
     },
-    createEditButton: function() {
-        const editButton = document.createElement("button");
-        editButton.textContent = "Edit";
-        editButton.className = "editButton";
-        return editButton
-    },
-    createConfirmEditButton: function() {
-        const confirmEditButton = document.createElement("button");
-        confirmEditButton.textContent = "Confirm";
-        confirmEditButton.className = "confirmEditButton";
-        return confirmEditButton;
-    },
-    createCancelEditButton: function() {
-        const cancelEditButton = document.createElement("button");
-        cancelEditButton.textContent = "Cancel";
-        cancelEditButton.className = "cancelEditButton";
-        return cancelEditButton;
-    },
     createDeleteButton: function() {
         const deleteButton = document.createElement("button");
-        deleteButton.textContent = "Delete";
+        deleteButton.innerHTML = "&times;";
         deleteButton.className = "deleteButton";
         return deleteButton;
     },
     setUpEventListeners: function() {
         const booklistUl = document.querySelector("ul");
-
         booklistUl.addEventListener("click", function(event) {
             const elementClicked = event.target;
-            console.log(elementClicked);
             if (elementClicked.className === "deleteButton") {
-                handlers.deleteBook(parseInt(elementClicked.parentNode.id));
-            } else if (elementClicked.className === "editButton") {
-                handlers.editBook(parseInt(elementClicked.parentNode.id));
-            } else if (elementClicked.className === "confirmEditButton") {
-                handlers.confirmEditBook(parseInt(elementClicked.parentNode.id));
-            } else if (elementClicked.className === "cancelEditButton") {
-                handlers.cancelEditBook();
+                handlers.deleteBook(elementClicked.parentNode.id);
             };
         });
-
-        document.querySelectorAll(".getResults").forEach(function(button) {
-            button.addEventListener("click", function() {
-                document.getElementById("booklist").style.display = "none";
-                
-                document.getElementById("ebayResults").innerHTML = "";
-
-                booklist.books.forEach(function(book) {
-                    const searchTerm = `${book.title} ${book.author}`;
-
-                    maxPrice = (book.maxPrice) ? book.maxPrice : "3";
-                    const filterarray = constructFilterArray(maxPrice, "GBP");
-                    const urlfilter = buildURLArray(filterarray);
-                    const url = constructURL(urlfilter, searchTerm, "GB", "10");
-
-                    // Submit the request
-                    s=document.createElement('script'); // create script element
-                    s.src= url;
-                    document.body.appendChild(s);
-
+        document.querySelectorAll("input").forEach(function(bookField) {
+            bookField.addEventListener("input", () => {
+                handlers.updateBookField(bookField); 
+            });
+            if (bookField.className.includes("maxPrice")) {
+                bookField.addEventListener("blur", () => {
+                    handlers.removeBadInput(bookField);
                 })
-                document.getElementById("results").style.display = "block";
+            }
+        });
+        document.querySelectorAll("ul.booklist li").forEach(function(bookLi) {
+            bookLi.addEventListener("animationend", this.displayBooklist)
+        }, this);
+        document.querySelectorAll(".getResults").forEach(function(button) {
+            button.addEventListener("click", () => {
+                handlers.getEbayResults();
             });
         });
         document.querySelectorAll(".toBooklist").forEach(function(button) {
-            button.addEventListener("click", function() {
-                document.getElementById("booklist").style.display = "block";
-                document.getElementById("results").style.display = "none";
+            button.addEventListener("click", () => {
+                handlers.toBookList();
             });
         });
     }   
