@@ -58,6 +58,47 @@ const handlers = {
         console.log("----------------")
         const bookLi = document.getElementById(position);
         bookLi.style.animationPlayState = "running";
+    },
+    updateBookField: function(bookField) {
+        const re = /^\d*\.?\d?\d?$/;
+        if (bookField.className.includes("maxPrice") && !re.test(bookField.value)) {
+            bookField.classList.add("badInput");
+        } else if (bookField.className.includes("maxPrice") && re.test(bookField.value)) {
+            bookField.classList.remove("badInput");
+            handlers.editBook(parseInt(bookField.parentNode.id));
+        } else {
+            handlers.editBook(parseInt(bookField.parentNode.id));
+        }
+    },
+    removeBadInput: function(bookField) {
+        const re = /^\d*\.?\d?\d?$/;
+        if (!re.test(bookField.value)) {
+            bookField.value = "";
+            bookField.classList.remove("badInput");
+        }
+    },
+    getEbayResults: function() {
+        document.getElementById("booklistDiv").style.display = "none";
+        document.getElementById("ebayResults").innerHTML = "";
+        booklist.books.forEach(function(book) {
+            const searchTerm = `${book.title} ${book.author}`;
+
+            maxPrice = (book.maxPrice) ? book.maxPrice : "3";
+            const filterarray = constructFilterArray(maxPrice, "GBP");
+            const urlfilter = buildURLArray(filterarray);
+            const url = constructURL(urlfilter, searchTerm, "GB", "2");
+
+            // Submit the request
+            s=document.createElement('script'); // create script element
+            s.src= url;
+            document.body.appendChild(s);
+
+        })
+        document.getElementById("results").style.display = "block";
+    },
+    toBookList: function() {
+        document.getElementById("booklistDiv").style.display = "block";
+        document.getElementById("results").style.display = "none";
     }
   };
 
@@ -103,59 +144,27 @@ var view = {
                 handlers.deleteBook(elementClicked.parentNode.id);
             };
         });
-
         document.querySelectorAll("input").forEach(function(bookField) {
             bookField.addEventListener("input", () => {
-                const re = /^\d*\.?\d?\d?$/;
-                if (bookField.className.includes("maxPrice") && !re.test(bookField.value)) {
-                    bookField.classList.add("badInput");
-                } else if (bookField.className.includes("maxPrice") && re.test(bookField.value)) {
-                    bookField.classList.remove("badInput");
-                    handlers.editBook(parseInt(bookField.parentNode.id));
-                } else {
-                    handlers.editBook(parseInt(bookField.parentNode.id));
-                }
+                handlers.updateBookField(bookField); 
             });
             if (bookField.className.includes("maxPrice")) {
                 bookField.addEventListener("blur", () => {
-                    const re = /^\d*\.?\d?\d?$/;
-                    if (!re.test(bookField.value)) {
-                        bookField.value = "";
-                        bookField.classList.remove("badInput");
-                    }
+                    handlers.removeBadInput(bookField);
                 })
             }
-        }, this);
+        });
         document.querySelectorAll("ul.booklist li").forEach(function(bookLi) {
             bookLi.addEventListener("animationend", this.displayBooklist)
         }, this);
         document.querySelectorAll(".getResults").forEach(function(button) {
             button.addEventListener("click", function() {
-                document.getElementById("booklistDiv").style.display = "none";
-                
-                document.getElementById("ebayResults").innerHTML = "";
-
-                booklist.books.forEach(function(book) {
-                    const searchTerm = `${book.title} ${book.author}`;
-
-                    maxPrice = (book.maxPrice) ? book.maxPrice : "3";
-                    const filterarray = constructFilterArray(maxPrice, "GBP");
-                    const urlfilter = buildURLArray(filterarray);
-                    const url = constructURL(urlfilter, searchTerm, "GB", "2");
-
-                    // Submit the request
-                    s=document.createElement('script'); // create script element
-                    s.src= url;
-                    document.body.appendChild(s);
-
-                })
-                document.getElementById("results").style.display = "block";
+                handlers.getEbayResults();
             });
         });
         document.querySelectorAll(".toBooklist").forEach(function(button) {
             button.addEventListener("click", function() {
-                document.getElementById("booklistDiv").style.display = "block";
-                document.getElementById("results").style.display = "none";
+                handlers.toBookList();
             });
         });
     }   
