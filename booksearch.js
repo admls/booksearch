@@ -74,17 +74,6 @@ const handlers = {
         const bookLi = document.getElementById(id);
         bookLi.style.animationPlayState = "running";
     },
-    updateBookField: function(bookField) {
-        const re = /^\d*\.?\d?\d?$/;
-        if (bookField.className.includes("maxPrice") && !re.test(bookField.value)) {
-            bookField.classList.add("badInput");
-        } else if (bookField.className.includes("maxPrice") && re.test(bookField.value)) {
-            bookField.classList.remove("badInput");
-            handlers.editBook(bookField.parentNode.id);
-        } else {
-            handlers.editBook(bookField.parentNode.id);
-        }
-    },
     badInput: function(inputField) {
         const re = /^\d*\.?\d?\d?$/;
         if (!re.test(inputField.value)) {
