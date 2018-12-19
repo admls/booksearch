@@ -112,6 +112,9 @@ const handlers = {
     toBookList: function() {
         document.getElementById("booklistDiv").style.display = "block";
         document.getElementById("results").style.display = "none";
+    },
+    linkHover: function(link) {
+        link.querySelector("img").className = "visibleHoverImg";
     }
   };
 
@@ -150,6 +153,7 @@ var view = {
         return deleteButton;
     },
     setUpEventListeners: function() {
+
         const booklistUl = document.querySelector("ul");
         booklistUl.addEventListener("click", function(event) {
             const elementClicked = event.target;
@@ -173,14 +177,14 @@ var view = {
         document.querySelectorAll("ul.booklist li").forEach(function(bookLi) {
             bookLi.addEventListener("animationend", this.displayBooklist)
         }, this);
-        document.querySelectorAll(".getResults").forEach(function(button) {
-            button.addEventListener("click", () => {
-                handlers.getEbayResults();
-            });
-        });
         document.querySelectorAll(".toBooklist").forEach(function(button) {
             button.addEventListener("click", () => {
                 handlers.toBookList();
+            });
+        });
+        document.querySelectorAll(".getResults").forEach(function(button) {
+            button.addEventListener("click", () => {
+                handlers.getEbayResults();
             });
         });
     }   
@@ -195,7 +199,6 @@ view.setUpEventListeners();
 function _cb_findItemsByKeywords(root) {
     var items = root.findItemsByKeywordsResponse[0].searchResult[0].item || [];
     var html = [];
-    html.push('<table width="100%" border="0" cellspacing="0" cellpadding="3"><tbody>');
     for (var i = 0; i < items.length; ++i) {
         var item     = items[i];
         var title    = item.title;
@@ -205,11 +208,9 @@ function _cb_findItemsByKeywords(root) {
         var currentPrice = sellingStatus.currentPrice && sellingStatus.currentPrice[0] || {};
         var displayPrice = currentPrice['@currencyId'] + ' ' + currentPrice['__value__'];
         if (null != title && null != viewitem) {
-            html.push('<tr><td>' + '<img src="' + pic + '" border="0">' + '</td>' +
-            '<td><a href="' + viewitem + '" target="_blank">' + title + '</a><h3>' +displayPrice+ '</h3></td></tr>');
+            html.push('<a href="' + viewitem + '" target="_blank">' + title + '<div><img src="' + pic + '" border="0"></div></a><h3>' +displayPrice+ '</h3>');
         }
     }
-    html.push('</tbody></table>');
     document.getElementById("ebayResults").innerHTML += html.join("");
 }  // End _cb_findItemsByKeywords() function
 
