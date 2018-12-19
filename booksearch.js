@@ -18,11 +18,7 @@ const booklist = {
         localStorage.setItem("books", JSON.stringify(this.books));
     },
     deleteBook: function(position) {
-        if (this.books.length === 1) {
-            this.books = [];
-        } else {
-            this.books.splice(position, 1);
-        }
+        this.books.splice(position, 1);
         localStorage.setItem("books", JSON.stringify(this.books));
     }
 };
@@ -34,6 +30,10 @@ const handlers = {
         const addBookMaxPrice = document.getElementById("addBookMaxPrice");
         if (!(addBookTitle.value || addBookAuthor.value)) {
             return false;
+        }
+        const re = /^\d*\.?\d?\d?$/;
+        if (!re.test(addBookMaxPrice.value)) {
+            addBookMaxPrice.value = "";
         }
         booklist.addBook(addBookTitle.value, addBookAuthor.value, addBookMaxPrice.value);
         addBookTitle.value = "";
@@ -51,7 +51,11 @@ const handlers = {
     },
     deleteBook: function(position) {
         booklist.deleteBook(parseInt(position));
-        console.log(localStorage.getItem("books"));
+        console.log("----------------")
+        JSON.parse(localStorage.getItem("books")).forEach(function(book) {
+            console.log(book.title)
+        })
+        console.log("----------------")
         const bookLi = document.getElementById(position);
         bookLi.style.animationPlayState = "running";
     }
@@ -81,7 +85,7 @@ var view = {
             bookLi.appendChild(titleInput);
             bookLi.appendChild(authorInput);
             bookLi.appendChild(maxPriceInput);
-            bookLi.appendChild(this.createDeleteButton());
+            bookLi.appendChild(view.createDeleteButton());
             booklistUl.appendChild(bookLi);
         }, this);
     },
@@ -96,13 +100,12 @@ var view = {
         booklistUl.addEventListener("click", function(event) {
             const elementClicked = event.target;
             if (elementClicked.className === "deleteButton") {
-                debugger;
                 handlers.deleteBook(elementClicked.parentNode.id);
             };
         });
 
         document.querySelectorAll("input").forEach(function(bookField) {
-            bookField.addEventListener("keyup", () => {
+            bookField.addEventListener("input", () => {
                 const re = /^\d*\.?\d?\d?$/;
                 if (bookField.className.includes("maxPrice") && !re.test(bookField.value)) {
                     bookField.classList.add("badInput");
@@ -113,11 +116,19 @@ var view = {
                     handlers.editBook(parseInt(bookField.parentNode.id));
                 }
             });
-            // bookField.addEventListener("blur", () => {
-            //     this.displayBooklist();
-            // })
+            if (bookField.className.includes("maxPrice")) {
+                bookField.addEventListener("blur", () => {
+                    const re = /^\d*\.?\d?\d?$/;
+                    if (!re.test(bookField.value)) {
+                        bookField.value = "";
+                        bookField.classList.remove("badInput");
+                    }
+                })
+            }
         }, this);
-
+        document.querySelectorAll("ul.booklist li").forEach(function(bookLi) {
+            bookLi.addEventListener("animationend", this.displayBooklist)
+        }, this);
         document.querySelectorAll(".getResults").forEach(function(button) {
             button.addEventListener("click", function() {
                 document.getElementById("booklistDiv").style.display = "none";
