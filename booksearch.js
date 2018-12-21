@@ -94,6 +94,30 @@ const handlers = {
             inputField.classList.remove("badInput");
         }
     },
+    badDefault: function(defaultField) {
+        debugger;
+        const reDecimal = /^\d*\.?\d?\d?$/;
+        const reNumeral = /^\d*$/;
+        if ((!reDecimal.test(defaultField.value) && defaultField.id === "defaultMaxPrice") ||
+        !reNumeral.test(defaultField.value) && defaultField.id === "resultsPerBook") {
+            defaultField.classList.add("badInput");
+        } else {
+            defaultField.classList.remove("badInput");
+            if (defaultField.value !== "") {
+                defaultSearchValues[defaultField.id] = defaultField.value;
+                localStorage.setItem("defaultSearchValues", JSON.stringify(defaultSearchValues));
+            }
+        }
+    },
+    removeBadDefault: function(defaultField) {
+        const reDecimal = /^\d*\.?\d?\d?$/;
+        const reNumeral = /^\d*$/;
+        if ((!reDecimal.test(defaultField.value) && defaultField.id === "defaultMaxPrice") ||
+        !reNumeral.test(defaultField.value) && defaultField.id === "resultsPerBook") {
+            defaultField.value = "";
+            defaultField.classList.remove("badInput");
+        }
+    },
     getEbayResults: function() {
         document.getElementById("booklistDiv").style.display = "none";
         document.getElementById("ebayResults").innerHTML = "<hr>";
@@ -180,7 +204,7 @@ var view = {
             });
             inputField.addEventListener("blur", () => {
                 handlers.removeBadInput(inputField);
-            })
+            });
         });
         document.querySelectorAll("ul.booklist li").forEach(function(bookLi) {
             bookLi.addEventListener("animationend", this.displayBooklist)
@@ -193,6 +217,14 @@ var view = {
         document.querySelectorAll(".getResults").forEach(function(button) {
             button.addEventListener("click", () => {
                 handlers.getEbayResults();
+            });
+        });
+        document.querySelectorAll("#defaultsWrapper input").forEach(function(defaultField) {
+            defaultField.addEventListener("input", () => {
+                handlers.badDefault(defaultField);
+            });
+            defaultField.addEventListener("blur", () => {
+                handlers.removeBadDefault(defaultField);
             });
         });
     }   
