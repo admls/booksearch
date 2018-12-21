@@ -8,26 +8,35 @@
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
-    <h1>Booksearch</h1>
+    <h2>Booksearch</h2>
     <div id="booklistDiv">
-        <h2>Booklist</h2>
-        <button class="getResults">Get Results</button>
+        <button class="getResults top">Get Results</button>
+        <form id="defaultsWrapper">
+            <input id="defaultMaxPrice" class="maxPrice" type="text" placeholder="Default Budget" autocomplete="off">
+            <input id="resultsPerBook" type="text" placeholder="Results per Book" autocomplete="off">
+        </form>
+        <hr>
         <div>
-            <form>
-                <button onclick="handlers.addBook()">Add</button>
+            <form id="addBook">
                 <input id="addBookTitle" class="title" type="text" placeholder="Title" autocomplete="off">
                 <input id="addBookAuthor" class="author" type="text" placeholder="Author" autocomplete="off">
-                <input id="addBookMaxPrice" class="maxPrice" type="text" placeholder="Budget" autocomplete="off">
+                <div class="budgetButtonWrapper">
+                    <input id="addBookMaxPrice" class="maxPrice" type="text" placeholder="Budget" autocomplete="off">
+                    <button id="addButton" onclick="handlers.addBook()">Add</button>
+                </div>
             </form>
         </div>
+        <hr>
         <ul class="booklist">
         </ul>
-        <button class="getResults">Get Results</button>
+        <hr>
+        <button class="getResults bottom">Get Results</button>
     </div>
 
     <div id="results" style="display: none;">
-        <button class="toBooklist">To Booklist</button>
+        <button class="toBooklist top">To Booklist</button>
         <div id="ebayResults"></div>
+        <button class="toBooklist bottom">To Booklist</button>
     </div>
 
     <script src="booksearch.js">

@@ -141,8 +141,15 @@ var view = {
             bookLi.id = id;
             bookLi.appendChild(titleInput);
             bookLi.appendChild(authorInput);
-            bookLi.appendChild(maxPriceInput);
-            bookLi.appendChild(view.createDeleteButton());
+
+            const div = document.createElement('div');
+            div.className = "budgetButtonWrapper";
+            div.appendChild(maxPriceInput);
+            div.appendChild(view.createDeleteButton());
+            bookLi.appendChild(div);
+
+            // bookLi.appendChild(maxPriceInput);
+            // bookLi.appendChild(view.createDeleteButton());
             booklistUl.appendChild(bookLi);
         }, this);
     },
@@ -158,7 +165,7 @@ var view = {
         booklistUl.addEventListener("click", function(event) {
             const elementClicked = event.target;
             if (elementClicked.className === "deleteButton") {
-                handlers.deleteBook(elementClicked.parentNode.id);
+                handlers.deleteBook(elementClicked.parentNode.parentNode.id);
             };
         });
         document.querySelectorAll("li .title, li .author").forEach(function(bookField) {
@@ -235,13 +242,7 @@ function _cb_findItemsByKeywords(root) {
     if (html.length !== 0) {
         title = "<h3 class='title'>" + searchTerm + "</h3><br>";
         html.push('<hr>')
-    };
-
-    // console.log(url);
-    console.log(rawSearchTerm);
-    console.log(searchTerm);
-
-    
+    };    
     document.getElementById("ebayResults").innerHTML += title + html.join("");
 }  // End _cb_findItemsByKeywords() function
 
@@ -309,40 +310,3 @@ function constructURL(urlfilter, searchTerm, siteLocationCode, numEntries) {
 }
 
 
-// function _cb_findItemsByKeywords(root) {
-//     var items = root && root.findItemsByKeywordsResponse && root.findItemsByKeywordsResponse[0] && root.findItemsByKeywordsResponse[0].searchResult && root.findItemsByKeywordsResponse[0].searchResult[0] && root.findItemsByKeywordsResponse[0].searchResult[0].item || [];
-//     var html = []; html.push('<table width="100%" border="0" cellspacing="0" cellpadding="3"><tbody>');
-//     for (var i = 0; i < items.length; ++i) {
-//         var item = items[i];
-//         var shippingInfo = item.shippingInfo && item.shippingInfo[0] || {};
-//         var sellingStatus = item.sellingStatus && item.sellingStatus[0] || {};
-//         var listingInfo = item.listingInfo && item.listingInfo[0] || {};
-//         var title = item.title;
-//         var subtitle = item.subtitle || '';
-//         var pic = item.galleryURL;
-//         var viewitem = item.viewItemURL;
-//         var currentPrice = sellingStatus.currentPrice && sellingStatus.currentPrice[0] || {};
-//         var displayPrice = currentPrice['@currencyId'] + ' ' + currentPrice['__value__'];
-//         var buyItNowAvailable = listingInfo.buyItNowAvailable && listingInfo.buyItNowAvailable[0] === 'true';
-//         var freeShipping = shippingInfo.shippingType && shippingInfo.shippingType[0] === 'Free';
-//         if (null !== title && null !== viewitem) {
-//             html.push('<tr><td class="image-container"><img src="' + pic + '"border = "0"></td>');
-//             html.push('<td class="data-container"><a class="item-link" href="' + viewitem + '"target="_blank">');
-//             html.push('<p class="title">' + title + '</p>'); html.push('<p class="subtitle">' + subtitle + '</p>');
-//             html.push('<p class="price">' + displayPrice + '</p>');
-//             if (buyItNowAvailable) {
-//                 html.push('<p class="bin">Buy It Now</p>');
-//             }
-//             if (freeShipping) {
-//                 html.push('<p class="fs">Free shipping</p>');
-//             }
-//             html.push('</a></td></tr>');
-//         }
-//     }
-//     html.push(" </tbody></table>");
-//     document.getElementById("ebayResults").innerHTML = html.join("");
-// } 
-
-// function createSrc() {
-//     return `https://svcs.ebay.com/services/search/FindingService/v1?SECURITY-APPNAME=AdamSher-Booksear-PRD-38dd99240-7ddfbe7a&OPERATION-NAME=findItemsByKeywords&SERVICE-VERSION=1.0.0&RESPONSE-DATA-FORMAT=JSON&callback=_cb_findItemsByKeywords&REST-PAYLOAD&keywords=${searchTerm}&paginationInput.entriesPerPage=6&GLOBAL-ID=EBAY-${location}&siteid=3`
-// }
