@@ -92,7 +92,7 @@ const handlers = {
     },
     getEbayResults: function() {
         document.getElementById("booklistDiv").style.display = "none";
-        document.getElementById("ebayResults").innerHTML = "";
+        document.getElementById("ebayResults").innerHTML = "<hr>";
         booklist.books.forEach(function(book) {
             const searchTerm = `${book.title} ${book.author}`;
 
@@ -197,21 +197,52 @@ view.setUpEventListeners();
 
 // Parse the response and build an HTML table to display search results
 function _cb_findItemsByKeywords(root) {
-    var items = root.findItemsByKeywordsResponse[0].searchResult[0].item || [];
-    var html = [];
-    for (var i = 0; i < items.length; ++i) {
-        var item     = items[i];
-        var title    = item.title;
-        var pic      = item.galleryURL;
-        var viewitem = item.viewItemURL;
-        var sellingStatus = item.sellingStatus && item.sellingStatus[0] || {};
-        var currentPrice = sellingStatus.currentPrice && sellingStatus.currentPrice[0] || {};
-        var displayPrice = currentPrice['@currencyId'] + ' ' + currentPrice['__value__'];
+    // console.log(root);
+    const items = root.findItemsByKeywordsResponse[0].searchResult[0].item || [];
+    items.sort((item1, item2) => {
+        function getPrice(item) {
+            const sellingStatus = item.sellingStatus && item.sellingStatus[0] || {};
+            const currentPrice = sellingStatus.currentPrice && sellingStatus.currentPrice[0] || {};
+            return [currentPrice['@currencyId'], Number(currentPrice['__value__'])];
+        }
+        item1["price"] = getPrice(item1);
+        item2["price"] = getPrice(item2);
+        if (item1["price"][0] === item2["price"][0]) {
+            return item1["price"][1] - item2["price"][1];
+        }
+        return 0;
+    });
+    const html = [];
+    for (let i = 0; i < items.length; ++i) {
+        const item     = items[i];
+        const title    = item.title;
+        const pic      = item.galleryURL;
+        const viewitem = item.viewItemURL;
+        const displayPrice = item["price"][1].toString() + " " + item["price"][0];
         if (null != title && null != viewitem) {
-            html.push('<a href="' + viewitem + '" target="_blank">' + title + '<div><img src="' + pic + '" border="0"></div></a><h3>' +displayPrice+ '</h3>');
+            html.push('<div class="resultWrapper"><h4>' + displayPrice + 
+            '</h4><a href="' + viewitem + '" target="_blank">' + title + 
+            '<div><img src="' + pic + '" border="0"></div></a></div>');
         }
     }
-    document.getElementById("ebayResults").innerHTML += html.join("");
+
+    const url = root.findItemsByKeywordsResponse[0].itemSearchURL[0];
+    const startPosition = url.search("&_nkw=") + 6;
+    const endPosition = url.search("&fscurrency");
+    const rawSearchTerm = decodeURIComponent(url.slice(startPosition, endPosition));
+    const searchTerm = rawSearchTerm.replace(/\+/g, " ");
+    let title = "";
+    if (html.length !== 0) {
+        title = "<h3 class='title'>" + searchTerm + "</h3><br>";
+        html.push('<hr>')
+    };
+
+    // console.log(url);
+    console.log(rawSearchTerm);
+    console.log(searchTerm);
+
+    
+    document.getElementById("ebayResults").innerHTML += title + html.join("");
 }  // End _cb_findItemsByKeywords() function
 
 // Create a JavaScript array of the item filters you want to use in your request
