@@ -10,6 +10,10 @@ function uuidv4() {
     )
 };
 
+// Default search values
+let defaultSearchValues = (localStorage.getItem("defaultSearchValues")) ? 
+JSON.parse(localStorage.getItem("defaultSearchValues")) : {defaultMaxPrice: "5", resultsPerBook: "5"};
+
 // Booklist object
 const booklist = {
     books: books,
@@ -96,10 +100,10 @@ const handlers = {
         booklist.books.forEach(function(book) {
             const searchTerm = `${book.title} ${book.author}`;
 
-            maxPrice = (book.maxPrice) ? book.maxPrice : "3";
+            maxPrice = (book.maxPrice) ? book.maxPrice : defaultSearchValues.defaultMaxPrice;
             const filterarray = constructFilterArray(maxPrice, "GBP");
             const urlfilter = buildURLArray(filterarray);
-            const url = constructURL(urlfilter, searchTerm, "GB", "2");
+            const url = constructURL(urlfilter, searchTerm, "GB", defaultSearchValues.resultsPerBook);
 
             // Submit the request
             s=document.createElement('script'); // create script element
@@ -147,9 +151,6 @@ var view = {
             div.appendChild(maxPriceInput);
             div.appendChild(view.createDeleteButton());
             bookLi.appendChild(div);
-
-            // bookLi.appendChild(maxPriceInput);
-            // bookLi.appendChild(view.createDeleteButton());
             booklistUl.appendChild(bookLi);
         }, this);
     },
