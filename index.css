@@ -51,11 +51,15 @@ table {
 --------------------------------------------
 Beginning of css styling */
 
+/* 
+#cf9125
+ */
+
 :root {
     --main-bg-color: #e1d8c9;
     --secondary-bg-color: #fcfcfe;
     --primary-text-color: #777;
-    --understated-text-color: #aaa;
+    --understated-text-color: #888;
     --v-understated-text-color: #ccc;
     --highlight-selection: #555;
 }
@@ -73,11 +77,18 @@ body::selection, input::selection, button::selection, p::selection, div::selecti
 }
 
 #booklistDiv, #results {
-    width: 60%;
+    box-sizing: border-box;
+    position: relative;
+    width: 75%;
     margin: auto;
     background-color: var(--secondary-bg-color);
     box-shadow: 3px 3px 16px 1px rgba(0,0,0,.2);
     margin-top: 30px;
+    margin-bottom: 60px;
+}
+
+#booklistDiv {
+    padding: 70px 15px 80px 15px;
 }
 
 @media only screen and (max-width: 900px) {
@@ -86,13 +97,42 @@ body::selection, input::selection, button::selection, p::selection, div::selecti
     }
 }
 
-#results {
-    box-sizing: border-box;
+#addBook {
     position: relative;
+    padding: 0px;
+    margin: 6px 0px 6px 0px;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    height: 40px;
+}
+
+#defaultsWrapper {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+    height: 35px;
+}
+
+@media only screen and (max-width: 350px) {
+    #defaultsWrapper {
+        height: 60px;
+    }
+}
+
+#defaultMaxPrice, #resultsPerBook {
+    width: 130px;
+}
+
+#addButton {
+    margin: 2px 0px 0px 3px;
+    height: 24px;
+}
+
+#results {
     z-index: initial;
     isolation: isolate;
     padding: 1px 0px;
-    margin-bottom: 60px;
 }
 
 #ebayResults {
@@ -168,16 +208,22 @@ h4 {
     width: 80px;
 }
 
+h2 {
+    font-size: 1.2em;
+}
+
 input {
     color: var(--primary-text-color);
     font-family: monospace, monospace;
     border: none;
     font-weight: bold;
     background-color: transparent;
-    margin: 8px 8px 8px 8px;
+    margin: 2px 8px 2px 8px;
     padding: 3px;
-    box-shadow: 0px 0px 0px 1px rgba(0,0,0,.05);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,.1);
     transition: all .5s;
+    width: 180px;
+    height: 18px;
 }
 
 input::placeholder {
@@ -186,8 +232,15 @@ input::placeholder {
 
 input:hover, input:focus {
     box-shadow: 3px 3px 12px 1px rgba(0,0,0,.3);
-    padding: 7px;
-    margin: 4px 4px 4px 4px;
+    height: 22px;
+}
+
+.budgetButtonWrapper {
+    width: 180px;
+    display: flex;
+    margin: 0px 8px 0px 8px;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 ul {
@@ -210,7 +263,6 @@ button {
 button:focus {
     box-shadow: 0px 0px 0px 1px rgba(0,0,0,.05);
 }
-
 
 .deleteButton {
     color: var(--v-understated-text-color);
@@ -237,22 +289,52 @@ button:focus {
     box-shadow: 0px 0px 0px 1px rgba(0,0,0,.05);
 }
 
-.toBooklist {
+.toBooklist, .getResults {
     margin: 0px;
     position: absolute;
-    z-index: 100;
     width: 200px;
-    left: -24px;
-    top: 24px;
     height: 24px;
 }
 
-
-#addBookMaxPrice, .maxPrice{
-    width: 50px;
+.toBooklist.top {
+    z-index: 100;
+    left: -24px;
+    top: 24px;   
 }
 
-@keyframes deleteBook {
+.toBooklist.bottom {
+    z-index: 100;
+    bottom: 12px;
+    right: -36px;   
+}
+
+@media only screen and (max-width: 900px) {
+    .toBooklist.bottom {
+        right: -24px;
+        bottom: 24px;  
+    }
+}
+
+.getResults.top {
+    top: 24px;
+    left: -24px;
+}
+
+.getResults.bottom {
+    bottom: 24px;
+    left: -24px;
+}
+
+#addBookMaxPrice, .maxPrice {
+    width: 100px;
+}
+
+.budgetButtonWrapper .maxPrice {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+@keyframes deleteBookWide {
     0% {
         opacity: 1;
         height: 40px;
@@ -273,11 +355,95 @@ button:focus {
 ul.booklist li {
     position: relative;
     padding: 0px;
-    margin: 0px;
-    animation-name: deleteBook;
-    animation-duration: .4s;
+    margin: 6px 0px 6px 0px;
+    animation-name: deleteBookWide;
+    animation-duration: .5s;
     animation-fill-mode: forwards;
     animation-play-state: paused;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+}
+
+ul.booklist li input {
+    flex: 0 0 auto;
+}
+
+@media only screen and (max-width: 647px) {
+    @keyframes deleteBookMiddle {
+        0% {
+            opacity: 1;
+            height: 70px;
+            line-height: 20px;
+        }
+        50% {
+            opacity: 0;
+            height: 70px;
+            line-height: 20px;
+        }
+        100% {
+            opacity: 0;
+            height: 0px;
+            line-height: 0px;        
+        }
+    }
+
+    ul.booklist li {
+        animation-name: deleteBookMiddle;
+        animation-duration: .5s;
+        animation-fill-mode: forwards;
+        animation-play-state: paused;
+        justify-content: flex-start;
+    }
+
+    #addBook {
+        height: 70px;
+        justify-content: flex-start;
+    }
+}
+
+@media only screen and (max-width: 450px) {
+    @keyframes deleteBookNarrow {
+        0% {
+            opacity: 1;
+            height: 95px;
+            line-height: 20px;
+        }
+        50% {
+            opacity: 0;
+            height: 95px;
+            line-height: 20px;
+        }
+        100% {
+            opacity: 0;
+            height: 0px;
+            line-height: 0px;        
+        }
+    }
+
+    ul.booklist li {
+        animation-name: deleteBookNarrow;
+        animation-duration: .5s;
+        animation-fill-mode: forwards;
+        animation-play-state: paused;
+    }
+
+    ul.booklist li > input {
+        flex: 1 1 180px;
+    }
+
+    #addBook {
+        height: 95px;
+    }
+
+    #addBook > input {
+        flex: 1 1 180px;
+    }
+
+    .budgetButtonWrapper {
+        flex: 1 1 180px;
+        margin-right: 8px;
+    }
 }
 
 .badInput {
