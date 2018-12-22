@@ -10,6 +10,10 @@ function uuidv4() {
     )
 };
 
+// Populate default search values
+let defaultSearchValues = (localStorage.getItem("defaultSearchValues")) ? 
+JSON.parse(localStorage.getItem("defaultSearchValues")) : {defaultMaxPrice: "", resultsPerBook: ""};
+
 // Booklist object
 const booklist = {
     books: books,
@@ -65,12 +69,7 @@ const handlers = {
     },
     deleteBook: function(id) {
         booklist.deleteBook(id);
-        console.log("----------------")
-        const books = new Map(JSON.parse(localStorage.getItem("books")))
-        books.forEach(function(book) {
-            console.log(book.title)
-        })
-        console.log("----------------")
+
         const bookLi = document.getElementById(id);
         bookLi.style.animationPlayState = "running";
     },
@@ -90,16 +89,40 @@ const handlers = {
             inputField.classList.remove("badInput");
         }
     },
+    badDefault: function(defaultField) {
+        const reDecimal = /^\d*\.?\d?\d?$/;
+        const reNumeral = /^\d*$/;
+        if ((!reDecimal.test(defaultField.value) && defaultField.id === "defaultMaxPrice") ||
+        !reNumeral.test(defaultField.value) && defaultField.id === "resultsPerBook") {
+            defaultField.classList.add("badInput");
+        } else {
+            defaultField.classList.remove("badInput");
+            defaultSearchValues[defaultField.id] = defaultField.value;
+            localStorage.setItem("defaultSearchValues", JSON.stringify(defaultSearchValues));
+        }
+    },
+    removeBadDefault: function(defaultField) {
+        const reDecimal = /^\d*\.?\d?\d?$/;
+        const reNumeral = /^\d*$/;
+        if ((!reDecimal.test(defaultField.value) && defaultField.id === "defaultMaxPrice") ||
+        !reNumeral.test(defaultField.value) && defaultField.id === "resultsPerBook") {
+            defaultField.value = "";
+            defaultField.classList.remove("badInput");
+        }
+    },
     getEbayResults: function() {
         document.getElementById("booklistDiv").style.display = "none";
         document.getElementById("ebayResults").innerHTML = "<hr>";
         booklist.books.forEach(function(book) {
             const searchTerm = `${book.title} ${book.author}`;
 
-            maxPrice = (book.maxPrice) ? book.maxPrice : "3";
+            const fallbackBudget = (defaultSearchValues.defaultMaxPrice) ? defaultSearchValues.defaultMaxPrice : "5";
+            const fallbackResults = (defaultSearchValues.resultsPerBook) ? defaultSearchValues.resultsPerBook : "5";
+        
+            maxPrice = (book.maxPrice) ? book.maxPrice : fallbackBudget;
             const filterarray = constructFilterArray(maxPrice, "GBP");
             const urlfilter = buildURLArray(filterarray);
-            const url = constructURL(urlfilter, searchTerm, "GB", "2");
+            const url = constructURL(urlfilter, searchTerm, "GB", fallbackResults);
 
             // Submit the request
             s=document.createElement('script'); // create script element
@@ -120,6 +143,8 @@ const handlers = {
 
 var view = {
     displayBooklist: function() {
+        view.displayDefaultSearchValues();
+
         localStorage.setItem("books", JSON.stringify(Array.from(booklist.books.entries())));
         const booklistUl = document.querySelector("ul.booklist");
         booklistUl.innerHTML = "";
@@ -147,11 +172,12 @@ var view = {
             div.appendChild(maxPriceInput);
             div.appendChild(view.createDeleteButton());
             bookLi.appendChild(div);
-
-            // bookLi.appendChild(maxPriceInput);
-            // bookLi.appendChild(view.createDeleteButton());
             booklistUl.appendChild(bookLi);
         }, this);
+    },
+    displayDefaultSearchValues: function() {
+        document.getElementById("defaultMaxPrice").value = defaultSearchValues.defaultMaxPrice;
+        document.getElementById("resultsPerBook").value = defaultSearchValues.resultsPerBook;
     },
     createDeleteButton: function() {
         const deleteButton = document.createElement("button");
@@ -179,7 +205,7 @@ var view = {
             });
             inputField.addEventListener("blur", () => {
                 handlers.removeBadInput(inputField);
-            })
+            });
         });
         document.querySelectorAll("ul.booklist li").forEach(function(bookLi) {
             bookLi.addEventListener("animationend", this.displayBooklist)
@@ -192,6 +218,14 @@ var view = {
         document.querySelectorAll(".getResults").forEach(function(button) {
             button.addEventListener("click", () => {
                 handlers.getEbayResults();
+            });
+        });
+        document.querySelectorAll("#defaultsWrapper input").forEach(function(defaultField) {
+            defaultField.addEventListener("input", () => {
+                handlers.badDefault(defaultField);
+            });
+            defaultField.addEventListener("blur", () => {
+                handlers.removeBadDefault(defaultField);
             });
         });
     }   
