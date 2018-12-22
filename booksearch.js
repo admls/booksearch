@@ -10,9 +10,9 @@ function uuidv4() {
     )
 };
 
-// Default search values
+// Populate default search values
 let defaultSearchValues = (localStorage.getItem("defaultSearchValues")) ? 
-JSON.parse(localStorage.getItem("defaultSearchValues")) : {defaultMaxPrice: "5", resultsPerBook: "5"};
+JSON.parse(localStorage.getItem("defaultSearchValues")) : {defaultMaxPrice: "", resultsPerBook: ""};
 
 // Booklist object
 const booklist = {
@@ -69,12 +69,7 @@ const handlers = {
     },
     deleteBook: function(id) {
         booklist.deleteBook(id);
-        console.log("----------------")
-        const books = new Map(JSON.parse(localStorage.getItem("books")))
-        books.forEach(function(book) {
-            console.log(book.title)
-        })
-        console.log("----------------")
+
         const bookLi = document.getElementById(id);
         bookLi.style.animationPlayState = "running";
     },
@@ -95,7 +90,6 @@ const handlers = {
         }
     },
     badDefault: function(defaultField) {
-        debugger;
         const reDecimal = /^\d*\.?\d?\d?$/;
         const reNumeral = /^\d*$/;
         if ((!reDecimal.test(defaultField.value) && defaultField.id === "defaultMaxPrice") ||
@@ -103,10 +97,8 @@ const handlers = {
             defaultField.classList.add("badInput");
         } else {
             defaultField.classList.remove("badInput");
-            if (defaultField.value !== "") {
-                defaultSearchValues[defaultField.id] = defaultField.value;
-                localStorage.setItem("defaultSearchValues", JSON.stringify(defaultSearchValues));
-            }
+            defaultSearchValues[defaultField.id] = defaultField.value;
+            localStorage.setItem("defaultSearchValues", JSON.stringify(defaultSearchValues));
         }
     },
     removeBadDefault: function(defaultField) {
@@ -124,10 +116,13 @@ const handlers = {
         booklist.books.forEach(function(book) {
             const searchTerm = `${book.title} ${book.author}`;
 
-            maxPrice = (book.maxPrice) ? book.maxPrice : defaultSearchValues.defaultMaxPrice;
+            const fallbackBudget = (defaultSearchValues.defaultMaxPrice) ? defaultSearchValues.defaultMaxPrice : "5";
+            const fallbackResults = (defaultSearchValues.resultsPerBook) ? defaultSearchValues.resultsPerBook : "5";
+        
+            maxPrice = (book.maxPrice) ? book.maxPrice : fallbackBudget;
             const filterarray = constructFilterArray(maxPrice, "GBP");
             const urlfilter = buildURLArray(filterarray);
-            const url = constructURL(urlfilter, searchTerm, "GB", defaultSearchValues.resultsPerBook);
+            const url = constructURL(urlfilter, searchTerm, "GB", fallbackResults);
 
             // Submit the request
             s=document.createElement('script'); // create script element
@@ -148,6 +143,8 @@ const handlers = {
 
 var view = {
     displayBooklist: function() {
+        view.displayDefaultSearchValues();
+
         localStorage.setItem("books", JSON.stringify(Array.from(booklist.books.entries())));
         const booklistUl = document.querySelector("ul.booklist");
         booklistUl.innerHTML = "";
@@ -177,6 +174,10 @@ var view = {
             bookLi.appendChild(div);
             booklistUl.appendChild(bookLi);
         }, this);
+    },
+    displayDefaultSearchValues: function() {
+        document.getElementById("defaultMaxPrice").value = defaultSearchValues.defaultMaxPrice;
+        document.getElementById("resultsPerBook").value = defaultSearchValues.resultsPerBook;
     },
     createDeleteButton: function() {
         const deleteButton = document.createElement("button");
