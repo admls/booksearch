@@ -53,10 +53,11 @@ Beginning of css styling */
 
 /* 
 #cf9125
+#e1d8c9
  */
 
 :root {
-    --main-bg-color: #e1d8c9;
+    --main-bg-color: #f09997;
     --secondary-bg-color: #fcfcfe;
     --primary-text-color: #777;
     --understated-text-color: #888;
@@ -121,7 +122,8 @@ body::selection, input::selection, button::selection, p::selection, div::selecti
 }
 
 #defaultMaxPrice, #resultsPerBook {
-    width: 130px;
+    width: 50px;
+    text-align: center;
 }
 
 #addButton {
