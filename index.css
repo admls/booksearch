@@ -54,12 +54,15 @@ Beginning of css styling */
 /* 
 #cf9125
 #e1d8c9
+
+#f09997
+#777
  */
 
 :root {
-    --main-bg-color: #f09997;
+    --main-bg-color: #f1615c;
     --secondary-bg-color: #fcfcfe;
-    --primary-text-color: #777;
+    --primary-text-color: rgb(97, 93, 93);
     --understated-text-color: #888;
     --v-understated-text-color: #ccc;
     --highlight-selection: #555;
