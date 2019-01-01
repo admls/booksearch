@@ -160,10 +160,10 @@ const handlers = {
     linkHover: function(link) {
         link.querySelector("img").className = "visibleHoverImg";
     },
-    openCountrySelector: function() {
-        const countryContainer = document.querySelector("#countryContainer");
-        countryContainer.focus();
-    },
+    // openCountrySelector: function() {
+    //     const countryContainer = document.querySelector("#countryContainer");
+    //     countryContainer.focus();
+    // },
     selectCountry: function(icon) {
         localStorage.setItem("currentCountry", icon.id);
         currentCountry = icon.id;
