@@ -450,4 +450,33 @@ ul.booklist li input {
     background-color: rgba(255,0,0,.3);
 }
 
+#iconCredit {
+    font-size: .8em;
+}
 
+#iconCredit a {
+    display: inline;
+}
+
+#countryContainer {
+    position: relative;
+}
+
+#countryDropdown {
+    position: absolute;
+    top: 100%;
+    z-index: 200;
+    display: none;
+}
+
+#countryContainer:hover #countryDropdown {
+    display: inline;
+}
+
+.currentCountry {
+    height: 28px;
+}
+
+.unselectedCountry {
+    height: 28px;
+}

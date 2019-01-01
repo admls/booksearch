@@ -10,9 +10,30 @@ function uuidv4() {
     )
 };
 
-// Populate default search values
+// Retrieve default search values from storage
 let defaultSearchValues = (localStorage.getItem("defaultSearchValues")) ? 
 JSON.parse(localStorage.getItem("defaultSearchValues")) : {defaultMaxPrice: "", resultsPerBook: ""};
+
+// Retrieve default country from storage
+let currentCountry = (localStorage.getItem("currentCountry")) ? localStorage.getItem("currentCountry") : "US";
+
+const countries = {
+    UK: {
+        icon: "uk.svg",
+        countryCode: "GB",
+        currencyCode: "GBP"
+    },
+    US: {
+        icon: "us.svg",
+        countryCode: "US",
+        currencyCode: "USD"
+    },
+    // CA: {
+    //     icon: "canada.svg",
+    //     countryCode: "ENCA",
+    //     currencyCode: "CAD"
+    // }
+}
 
 // Booklist object
 const booklist = {
@@ -120,9 +141,9 @@ const handlers = {
             const fallbackResults = (defaultSearchValues.resultsPerBook) ? defaultSearchValues.resultsPerBook : "5";
         
             maxPrice = (book.maxPrice) ? book.maxPrice : fallbackBudget;
-            const filterarray = constructFilterArray(maxPrice, "GBP");
+            const filterarray = constructFilterArray(maxPrice, countries[currentCountry]["currencyCode"]);
             const urlfilter = buildURLArray(filterarray);
-            const url = constructURL(urlfilter, searchTerm, "GB", fallbackResults);
+            const url = constructURL(urlfilter, searchTerm, countries[currentCountry]["countryCode"], fallbackResults);
 
             // Submit the request
             s=document.createElement('script'); // create script element
@@ -138,12 +159,57 @@ const handlers = {
     },
     linkHover: function(link) {
         link.querySelector("img").className = "visibleHoverImg";
+    },
+    openCountrySelector: function() {
+        const countryContainer = document.querySelector("#countryContainer");
+        countryContainer.focus();
+    },
+    selectCountry: function(icon) {
+        localStorage.setItem("currentCountry", icon.id);
+        currentCountry = icon.id;
+        view.displayCurrentCountry();
     }
-  };
+};
 
 var view = {
+    displayCurrentCountry: function() {
+        const countryContainer = document.getElementById("countryContainer");
+        if (countryContainer.childNodes.length === 2) {
+            countryContainer.removeChild(countryContainer.lastChild);
+        };
+        const icon = document.createElement("img");
+        icon.src = countries[currentCountry]["icon"];
+        icon.classList.add("currentCountry");
+        icon.addEventListener("click", () => {
+            handlers.openCountrySelector();
+        });
+        countryContainer.appendChild(icon);
+
+        // Populate countryDropdown with other options
+        const countryDropdown = countryContainer.querySelector("#countryDropdown");
+        while (countryDropdown.lastChild) {
+            countryDropdown.removeChild(countryDropdown.lastChild);
+        };
+        for (let country of Object.keys(countries)) {
+            if (country !== currentCountry) {
+                const icon = document.createElement("img");
+                icon.src = countries[country]["icon"];
+                icon.classList.add("unselectedCountry");
+                icon.id = country;
+                icon.addEventListener("click", () => {
+                    handlers.selectCountry(icon);
+                });
+                countryDropdown.appendChild(icon);
+            }
+        }
+    },
+    displayDefaultSearchValues: function() {
+        document.getElementById("defaultMaxPrice").value = defaultSearchValues.defaultMaxPrice;
+        document.getElementById("resultsPerBook").value = defaultSearchValues.resultsPerBook;
+    },
     displayBooklist: function() {
         view.displayDefaultSearchValues();
+        view.displayCurrentCountry();
 
         localStorage.setItem("books", JSON.stringify(Array.from(booklist.books.entries())));
         const booklistUl = document.querySelector("ul.booklist");
@@ -174,10 +240,6 @@ var view = {
             bookLi.appendChild(div);
             booklistUl.appendChild(bookLi);
         }, this);
-    },
-    displayDefaultSearchValues: function() {
-        document.getElementById("defaultMaxPrice").value = defaultSearchValues.defaultMaxPrice;
-        document.getElementById("resultsPerBook").value = defaultSearchValues.resultsPerBook;
     },
     createDeleteButton: function() {
         const deleteButton = document.createElement("button");
@@ -228,6 +290,15 @@ var view = {
                 handlers.removeBadDefault(defaultField);
             });
         });
+        // document.querySelector(".currentCountry").addEventListener("click", () => {
+        //     debugger;
+        //     handlers.openCountrySelector();
+        // });
+        // document.querySelectorAll(".unselectedCountry").forEach(function(icon) {
+        //     icon.addEventListener("click", () => {
+        //         handlers.selectCountry(icon);
+        //     })
+        // })
     }   
 };
 
@@ -238,7 +309,7 @@ view.setUpEventListeners();
 
 // Parse the response and build an HTML table to display search results
 function _cb_findItemsByKeywords(root) {
-    // console.log(root);
+    console.log(root);
     const items = root.findItemsByKeywordsResponse[0].searchResult[0].item || [];
     items.sort((item1, item2) => {
         function getPrice(item) {
