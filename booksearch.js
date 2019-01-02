@@ -141,8 +141,6 @@ const handlers = {
             const fallbackResults = (defaultSearchValues.resultsPerBook) ? defaultSearchValues.resultsPerBook : "5";
         
             maxPrice = (book.maxPrice) ? book.maxPrice : fallbackBudget;
-            console.log("book price", book.maxPrice);
-            console.log(book.title, book.maxPrice, fallbackBudget);
             const filterarray = constructFilterArray(maxPrice, countries[currentCountry]["currencyCode"]);
             const urlfilter = buildURLArray(filterarray);
             const url = constructURL(urlfilter, searchTerm, countries[currentCountry]["countryCode"], fallbackResults);
