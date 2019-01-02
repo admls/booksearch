@@ -100,7 +100,7 @@ const handlers = {
             inputField.classList.add("badInput");
         } else {
             inputField.classList.remove("badInput");
-            handlers.editBook(inputField.parentNode.id);
+            handlers.editBook(inputField.parentNode.parentNode.id);
         }
     },
     removeBadInput: function(inputField) {
@@ -141,6 +141,8 @@ const handlers = {
             const fallbackResults = (defaultSearchValues.resultsPerBook) ? defaultSearchValues.resultsPerBook : "5";
         
             maxPrice = (book.maxPrice) ? book.maxPrice : fallbackBudget;
+            console.log("book price", book.maxPrice);
+            console.log(book.title, book.maxPrice, fallbackBudget);
             const filterarray = constructFilterArray(maxPrice, countries[currentCountry]["currencyCode"]);
             const urlfilter = buildURLArray(filterarray);
             const url = constructURL(urlfilter, searchTerm, countries[currentCountry]["countryCode"], fallbackResults);
@@ -310,7 +312,6 @@ view.setUpEventListeners();
 
 // Parse the response and build an HTML table to display search results
 function _cb_findItemsByKeywords(root) {
-    console.log(root);
     const items = root.findItemsByKeywordsResponse[0].searchResult[0].item || [];
     items.sort((item1, item2) => {
         function getPrice(item) {
@@ -401,7 +402,7 @@ function  buildURLArray(filterarray) {
 
 // Construct the request
 function constructURL(urlfilter, searchTerm, siteLocationCode, numEntries) {
-    let url = "http://svcs.ebay.com/services/search/FindingService/v1";
+    let url = "https://svcs.ebay.com/services/search/FindingService/v1";
     url += "?OPERATION-NAME=findItemsByKeywords";
     url += "&SERVICE-VERSION=1.0.0";
     url += "&SECURITY-APPNAME=AdamSher-Booksear-PRD-38dd99240-7ddfbe7a";
