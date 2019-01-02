@@ -401,7 +401,7 @@ function  buildURLArray(filterarray) {
 
 // Construct the request
 function constructURL(urlfilter, searchTerm, siteLocationCode, numEntries) {
-    let url = "http://svcs.ebay.com/services/search/FindingService/v1";
+    let url = "https://svcs.ebay.com/services/search/FindingService/v1";
     url += "?OPERATION-NAME=findItemsByKeywords";
     url += "&SERVICE-VERSION=1.0.0";
     url += "&SECURITY-APPNAME=AdamSher-Booksear-PRD-38dd99240-7ddfbe7a";
