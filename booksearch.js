@@ -406,12 +406,13 @@ function constructURL(urlfilter, searchTerm, siteLocationCode, numEntries) {
     url += "&SERVICE-VERSION=1.0.0";
     url += "&SECURITY-APPNAME=AdamSher-Booksear-PRD-38dd99240-7ddfbe7a";
     url += `&GLOBAL-ID=EBAY-${siteLocationCode}`;
+    url += "&siteid=0"
     url += "&RESPONSE-DATA-FORMAT=JSON";
     url += "&callback=_cb_findItemsByKeywords";
     url += "&REST-PAYLOAD";
     url += `&keywords=${searchTerm}`;
     url += `&paginationInput.entriesPerPage=${numEntries}`;
-    url += urlfilter;
+    //url += urlfilter;
     return url
 }
 
