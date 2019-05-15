@@ -281,7 +281,6 @@ var view = {
         });
         document.querySelectorAll(".getResults").forEach(function(button) {
             button.addEventListener("click", () => {
-                debugger;
                 handlers.getEbayResults();
             });
         });
