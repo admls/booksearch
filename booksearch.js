@@ -413,6 +413,12 @@ function constructURL(urlfilter, searchTerm, siteLocationCode, numEntries) {
     url += `&keywords=${searchTerm}`;
     url += `&paginationInput.entriesPerPage=${numEntries}`;
     //url += urlfilter;
+    
+    fetch(url)
+    .then(res => res.json())
+    .then(data => console.log(data))
+    .cathc(err => console.log(err));
+    
     return url
 }
 
